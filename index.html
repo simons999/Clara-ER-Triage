@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clara - Emergency Room Pre-Arrival Triage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div id="main-container">
+
+        <!-- Demo Options Panel (appears to left of phone during demo) -->
+        <div id="demo-options-panel" class="demo-options-panel">
+            <div class="demo-panel-header">
+                <span class="demo-panel-icon">🎬</span>
+                <span class="demo-panel-title">Demo Script</span>
+            </div>
+            <div class="demo-panel-content" id="demo-panel-content">
+                <!-- Demo response options will appear here -->
+            </div>
+        </div>
+
+        <!-- Phone Frame -->
+        <div id="phone-frame">
+            <!-- Global 911 Button - Fixed position on all screens -->
+            <button class="emergency-911-global" aria-label="Call 911 emergency services">911</button>
+
+            <!-- Mode Selection Screen -->
+            <div id="mode-selection-screen" class="screen active">
+                <div class="mode-selection-content">
+                    <div class="clara-logo">
+                        <img src="clara_logo.svg" alt="Clara" class="logo-icon">
+                        <h1>Clara</h1>
+                        <p class="tagline">Emergency Room Assistant</p>
+                    </div>
+
+                    <p class="mode-selection-subtitle">Prepare the ER before you arrive</p>
+
+                    <div class="mode-selection-options">
+                        <!-- Limited Mode -->
+                        <button class="mode-option-btn" id="mode-limited-btn" onclick="AppMode.selectMode('limited')">
+                            <span class="mode-icon">⚡</span>
+                            <div class="mode-info">
+                                <span class="mode-title">Try Clara</span>
+                                <span class="mode-subtitle">Full AI experience with real conversations</span>
+                                <span class="mode-meta">3 sessions per day • No setup required</span>
+                            </div>
+                        </button>
+
+                        <!-- Demo Mode -->
+                        <button class="mode-option-btn" id="mode-demo-btn" onclick="AppMode.selectMode('demo')">
+                            <span class="mode-icon">🎬</span>
+                            <div class="mode-info">
+                                <span class="mode-title">Interactive Demo</span>
+                                <span class="mode-subtitle">Guided scenario with scripted responses</span>
+                                <span class="mode-meta">No AI • 2 min guided experience</span>
+                            </div>
+                        </button>
+
+                        <!-- Unlimited Mode -->
+                        <button class="mode-option-btn" id="mode-unlimited-btn" onclick="AppMode.selectMode('unlimited')">
+                            <span class="mode-icon">🔑</span>
+                            <div class="mode-info">
+                                <span class="mode-title">Unlimited Access</span>
+                                <span class="mode-subtitle">Use your own Gemini API key</span>
+                                <span class="mode-meta">Full experience • No limits</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="mode-selection-footer">
+                        <p class="competition-badge">🏆 Built for Google Gemini AI Competition</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Key Input Screen -->
+            <div id="api-key-screen" class="screen">
+                <div class="api-key-content">
+                    <button class="api-key-back-btn" onclick="AppMode.showModeSelection(); AppMode.hideApiKeyScreen();">
+                        ← Back
+                    </button>
+
+                    <div class="api-key-header">
+                        <div class="api-key-icon">🔑</div>
+                        <h2>Enter your Gemini API Key</h2>
+                    </div>
+
+                    <div class="api-key-form" id="api-key-form">
+                        <input
+                            type="password"
+                            id="api-key-input"
+                            class="api-key-input"
+                            placeholder="AIza..."
+                            autocomplete="off"
+                        >
+                        <p class="api-key-error" id="api-key-error"></p>
+                        <button class="api-key-submit" id="api-key-submit" onclick="AppMode.submitApiKey(document.getElementById('api-key-input').value)">
+                            Connect
+                        </button>
+                    </div>
+
+                    <div class="api-key-security">
+                        <span class="security-icon">🔒</span>
+                        <span>Your key stays on your device. Never sent to our servers.</span>
+                    </div>
+
+                    <div class="api-key-help">
+                        <p>Need a key? Get one free from Google AI Studio</p>
+                        <a href="https://aistudio.google.com/apikey" target="_blank" class="api-key-link">
+                            aistudio.google.com/apikey ↗
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="screen">
+
+                <div class="welcome-content">
+                    <div class="clara-logo">
+                        <img src="clara_logo.svg" alt="Clara" class="logo-icon">
+                        <h1>Clara</h1>
+                        <p class="tagline">Emergency Room Assistant</p>
+                    </div>
+
+                    <p class="instruction-text">How would you like to talk to Clara?</p>
+
+                    <div class="input-mode-buttons">
+                        <button class="mode-button speak-button">
+                            <img src="speak.svg" alt="Speak" class="icon">
+                            <span class="label">Speak</span>
+                        </button>
+                        <button class="mode-button type-button">
+                            <img src="text.svg" alt="Type" class="icon">
+                            <span class="label">Type</span>
+                        </button>
+                    </div>
+
+                    <p class="switch-text">You can switch anytime</p>
+                </div>
+            </div>
+
+            <!-- Conversation Screen -->
+            <div id="conversation-screen" class="screen">
+
+                <!-- TEXT MODE VIEW -->
+                <div class="text-mode-view" id="text-mode-view">
+                    <div class="conversation-header">
+                        <div class="header-left">
+                            <div class="mode-indicator" id="mode-indicator"></div>
+                        </div>
+                        <h2 class="header-title">Clara</h2>
+                        <button class="mode-switch-btn" id="mode-toggle-text">
+                            <img src="speak.svg" alt="Switch to voice" class="mode-icon">
+                        </button>
+                    </div>
+
+                    <div class="conversation-main" id="chat-area">
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+
+                    <!-- Demo Prompt Area (for guided demo experience) -->
+                    <div class="demo-prompt-area" id="demo-prompt-area">
+                        <!-- Demo prompts will be added here dynamically -->
+                    </div>
+
+                    <div class="conversation-input" id="input-area">
+                        <div class="text-input-wrapper" id="text-input-wrapper">
+                            <button class="photo-btn" id="photo-btn-text" title="Share a photo">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                            </button>
+                            <input type="text" id="message-input" placeholder="Message Clara..." autocomplete="off">
+                            <button class="send-btn" id="send-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VOICE MODE VIEW (Full Screen) -->
+                <div class="voice-mode-view" id="voice-mode-view" style="display: none;">
+                    <!-- Top Bar -->
+                    <div class="voice-top-bar">
+                        <div class="voice-top-spacer"></div>
+                        <button class="voice-view-report-btn" id="voice-view-report-btn" title="View Report">
+                            View Report
+                        </button>
+                        <button class="voice-mode-switch" id="mode-toggle-voice">
+                            <img src="text.svg" alt="Text" class="switch-icon">
+                            <span class="switch-label">Text</span>
+                        </button>
+                    </div>
+
+                    <!-- Blob Container -->
+                    <div class="voice-blob-container">
+                        <!-- Photo button - floating on right side -->
+                        <button class="voice-photo-btn" id="photo-btn-voice" title="Share a photo">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span class="photo-btn-label">Photo</span>
+                        </button>
+                        <div class="voice-blob" id="voice-blob">
+                            <div class="blob-core"></div>
+                            <div class="blob-ring blob-ring-1"></div>
+                            <div class="blob-ring blob-ring-2"></div>
+                            <div class="blob-ring blob-ring-3"></div>
+                            <!-- Checkmark for sent state -->
+                            <div class="blob-checkmark">
+                                <svg width="48" height="48" viewBox="0 0 48 48">
+                                    <path class="checkmark-path" d="M14 24 L21 31 L34 17" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="voice-status-text" id="voice-status-text">I'm listening...</p>
+                    </div>
+
+                    <!-- Voice Confirm Hint Card -->
+                    <div class="voice-confirm-hint" id="voice-confirm-hint">
+                        <div class="hint-header">Voice commands:</div>
+                        <ul class="hint-list">
+                            <li><strong>"Send"</strong> - send report</li>
+                            <li><strong>"Change [field] to..."</strong></li>
+                            <li><strong>"Read it again"</strong></li>
+                            <li><strong>"Show me"</strong> - view on screen</li>
+                        </ul>
+                    </div>
+
+                    <!-- Debug Controls (hidden, press 'D' to show) -->
+                    <div class="voice-debug" id="voice-debug" style="display: none;">
+                        <button onclick="ClaraApp.setVoiceState('idle')">Idle</button>
+                        <button onclick="ClaraApp.setVoiceState('listening')">Listening</button>
+                        <button onclick="ClaraApp.setVoiceState('processing')">Processing</button>
+                        <button onclick="ClaraApp.setVoiceState('responding')">Responding</button>
+                    </div>
+                </div>
+
+                <!-- Report Card Bottom Sheet (shared between modes) -->
+                <div class="report-sheet" id="report-sheet">
+                    <!-- Expanded View (above mini bar) -->
+                    <div class="report-expanded" id="report-expanded">
+                        <div class="report-expanded-header">
+                            <h3>
+                                <img src="report_icon.svg" alt="" class="report-icon-header">
+                                <span>Your ER Report</span>
+                            </h3>
+                            <span class="report-progress" id="report-progress">0 of 10 fields</span>
+                        </div>
+
+                        <p class="report-help-text">💬 Ask Clara to add or update any field</p>
+
+                        <div class="report-fields" id="report-fields">
+                            <!-- Fields will be rendered by JavaScript -->
+                        </div>
+
+                        <div class="report-footer">
+                            <div class="report-destination">
+                                <span class="destination-icon">📍</span>
+                                <span class="destination-label">Destination:</span>
+                                <span class="destination-value" id="destination-value">Not yet selected</span>
+                            </div>
+                            <div class="report-eta">
+                                <span class="eta-icon">🕐</span>
+                                <span class="eta-label">ETA:</span>
+                                <span class="eta-value" id="eta-value">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini View (anchored at bottom) -->
+                    <div class="report-mini" id="report-mini">
+                        <div class="report-mini-left">
+                            <div class="report-mini-label">
+                                <img src="report_icon.svg" alt="" class="report-icon">
+                                <span>Your Report</span>
+                            </div>
+                            <span class="report-mini-status" id="report-status">Gathering info...</span>
+                        </div>
+                        <div class="report-mini-right">
+                            <span class="report-hold-hint">Hold to view</span>
+                            <span class="report-expand-icon">▲</span>
+                        </div>
+                        <!-- Hold progress indicator -->
+                        <div class="report-hold-progress" id="report-hold-progress"></div>
+                    </div>
+                </div>
+
+                <!-- Dim Overlay -->
+                <div class="report-overlay" id="report-overlay"></div>
+            </div>
+
+            <!-- Confirmation Screen -->
+            <div id="confirmation-screen" class="screen" style="pointer-events: none;">
+                <!-- Header -->
+                <div class="confirm-header">
+                    <button class="confirm-back-btn" id="confirm-back-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        Back
+                    </button>
+                    <h2 class="confirm-title">Your Report</h2>
+                    <div class="confirm-header-spacer"></div>
+                </div>
+
+                <!-- Scrollable Content -->
+                <div class="confirm-content" id="confirm-content">
+                    <!-- Destination Card -->
+                    <div class="confirm-destination-card" id="confirm-destination-card">
+                        <div class="destination-card-content">
+                            <span class="destination-card-icon">🏥</span>
+                            <div class="destination-card-info">
+                                <span class="destination-card-name" id="confirm-dest-name">No destination selected</span>
+                                <span class="destination-card-eta" id="confirm-dest-eta"></span>
+                            </div>
+                        </div>
+                        <button class="destination-card-edit" id="edit-destination-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Warning for missing destination -->
+                    <div class="confirm-warning" id="confirm-dest-warning" style="display: none;">
+                        <span class="warning-icon">⚠️</span>
+                        <span class="warning-text">Please add a destination before sending</span>
+                    </div>
+
+                    <!-- Report Fields -->
+                    <div class="confirm-fields" id="confirm-fields">
+                        <!-- Fields will be rendered dynamically -->
+                    </div>
+
+                    <!-- Add More Info Button -->
+                    <button class="confirm-add-info-btn" id="confirm-add-info-btn">
+                        <span class="add-info-icon">+</span>
+                        <span class="add-info-text">Add more information</span>
+                    </button>
+
+                    <!-- Photos Section -->
+                    <div class="confirm-photos-section" id="confirm-photos-section">
+                        <div class="confirm-photos-header">
+                            <span class="confirm-photos-label">Photos</span>
+                            <span class="confirm-photos-count" id="confirm-photos-count">0</span>
+                        </div>
+                        <div class="confirm-photos-grid" id="confirm-photos-grid">
+                            <!-- Photos will be rendered dynamically -->
+                        </div>
+                        <button class="confirm-add-photo-btn" id="confirm-add-photo-btn">
+                            <span class="add-photo-icon">📷</span>
+                            <span class="add-photo-text">+ Add Photo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fixed Bottom Actions -->
+                <div class="confirm-actions">
+                    <button class="confirm-send-btn" id="confirm-send-btn">
+                        <span class="send-btn-icon">📤</span>
+                        <span class="send-btn-text">Send to ER</span>
+                    </button>
+                    <button class="confirm-back-to-chat-btn" id="confirm-back-to-chat-btn">
+                        <span class="back-chat-icon">←</span>
+                        <span class="back-chat-text">Back to Conversation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Sent Screen (overlays confirmation screen) -->
+            <div id="report-sent-screen" class="screen" style="pointer-events: none;">
+                <div class="sent-content">
+                    <div class="sent-checkmark" id="sent-checkmark">
+                        <svg width="80" height="80" viewBox="0 0 80 80">
+                            <circle class="checkmark-circle" cx="40" cy="40" r="36" fill="none" stroke="#34C759" stroke-width="4"/>
+                            <path class="checkmark-check" d="M24 40 L36 52 L56 28" fill="none" stroke="#34C759" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2 class="sent-title" id="sent-title">Report Sent</h2>
+                    <p class="sent-destination" id="sent-destination">to City General ER</p>
+                    <p class="sent-message">They'll be ready when you arrive.</p>
+                    <div class="sent-divider"></div>
+                    <p class="sent-companion-text">Clara is still here if you need anything on your way.</p>
+                    <div class="sent-actions">
+                        <button class="sent-continue-btn" id="sent-continue-btn">
+                            <span class="continue-icon">💬</span>
+                            <span class="continue-text">Continue with Clara</span>
+                        </button>
+                        <button class="sent-view-btn" id="sent-view-btn">
+                            <span class="view-text">View Sent Report</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Field Modal -->
+            <div class="edit-field-modal" id="edit-field-modal" style="pointer-events: none;">
+                <div class="edit-modal-overlay"></div>
+                <div class="edit-modal-content">
+                    <div class="edit-modal-header">
+                        <h3 class="edit-modal-title" id="edit-modal-title">Edit Field</h3>
+                        <button class="edit-modal-close" id="edit-modal-close">×</button>
+                    </div>
+                    <div class="edit-modal-options">
+                        <button class="edit-option-btn" id="edit-option-manual">
+                            <span class="edit-option-icon">✏️</span>
+                            <span class="edit-option-text">Edit manually</span>
+                        </button>
+                        <button class="edit-option-btn" id="edit-option-clara">
+                            <span class="edit-option-icon">💬</span>
+                            <span class="edit-option-text">Ask Clara to update</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Edit Modal -->
+            <div class="manual-edit-modal" id="manual-edit-modal" style="pointer-events: none;">
+                <div class="manual-edit-overlay"></div>
+                <div class="manual-edit-content">
+                    <div class="manual-edit-header">
+                        <h3 class="manual-edit-title" id="manual-edit-title">Edit Pain Level</h3>
+                        <button class="manual-edit-close" id="manual-edit-close">×</button>
+                    </div>
+                    <div class="manual-edit-body">
+                        <input type="text" class="manual-edit-input" id="manual-edit-input" placeholder="Enter new value">
+                    </div>
+                    <div class="manual-edit-actions">
+                        <button class="manual-edit-cancel" id="manual-edit-cancel">Cancel</button>
+                        <button class="manual-edit-save" id="manual-edit-save">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Clara Chat Modal -->
+            <div class="mini-clara-modal" id="mini-clara-modal" style="pointer-events: none;">
+                <div class="mini-clara-overlay"></div>
+                <div class="mini-clara-content">
+                    <div class="mini-clara-header">
+                        <h3 class="mini-clara-title">Ask Clara</h3>
+                        <button class="mini-clara-close" id="mini-clara-close">×</button>
+                    </div>
+                    <div class="mini-clara-messages" id="mini-clara-messages">
+                        <!-- Mini chat messages -->
+                    </div>
+                    <div class="mini-clara-input-area">
+                        <input type="text" class="mini-clara-input" id="mini-clara-input" placeholder="Tell Clara what to update...">
+                        <button class="mini-clara-send" id="mini-clara-send">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Show Dashboard Button (visible when dashboard is hidden) -->
+        <button id="show-dashboard-btn" class="show-dashboard-btn hidden">🏥 Show ER Dashboard</button>
+
+        <!-- ER Dashboard Panel -->
+        <div id="er-dashboard" class="hidden">
+            <!-- List View (default) -->
+            <div class="dashboard-list-view">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div class="dashboard-header-main">
+                        <span class="dashboard-hospital-icon">🏥</span>
+                        <div class="dashboard-header-text">
+                            <h2 class="dashboard-hospital-name">City General ER</h2>
+                            <span class="dashboard-subtitle">Incoming Patients</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-header-right">
+                        <div class="dashboard-live-indicator">
+                            <span class="live-dot"></span>
+                            <span class="live-text">Live</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter/Sort Bar -->
+                <div class="dashboard-controls">
+                    <div class="dashboard-filters">
+                        <button class="dashboard-filter-tab active" data-filter="all">All</button>
+                        <button class="dashboard-filter-tab" data-filter="new">New</button>
+                        <button class="dashboard-filter-tab" data-filter="reviewing">Reviewing</button>
+                        <button class="dashboard-filter-tab" data-filter="ready">Ready</button>
+                    </div>
+                    <div class="dashboard-sort">
+                        <label for="dashboard-sort">Sort:</label>
+                        <select id="dashboard-sort">
+                            <option value="eta">ETA</option>
+                            <option value="received">Time received</option>
+                            <option value="pain">Pain level</option>
+                            <option value="status">Status</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Patient List -->
+                <div class="dashboard-content">
+                    <div id="patient-list" class="patient-list">
+                        <!-- Patient cards rendered by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Dashboard Footer -->
+                <div class="dashboard-footer">
+                    <span id="patient-count">0 incoming patients</span>
+                </div>
+
+                <!-- Dashboard Demo Controls -->
+                <div class="dashboard-demo-controls">
+                    <button id="add-sample-patient-btn" class="demo-btn">+ Add Sample</button>
+                    <button id="simulate-arrival-btn" class="demo-btn">Simulate Arrival</button>
+                    <button id="clear-patients-btn" class="demo-btn danger">Clear All</button>
+                </div>
+            </div>
+
+            <!-- Detail View (shown when patient is selected) -->
+            <div id="patient-detail-view" class="patient-detail-view" style="display: none;">
+                <!-- Detail Header -->
+                <div class="detail-view-header">
+                    <button class="detail-back-btn" onclick="ERDashboard.hideDetail()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        Back to List
+                    </button>
+                    <h2 class="detail-view-title">Patient Report</h2>
+                    <div class="detail-header-spacer"></div>
+                </div>
+
+                <!-- Detail Content (scrollable) -->
+                <div class="detail-view-content" id="patient-detail-content">
+                    <!-- Content rendered by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Photo Modal -->
+            <div id="photo-modal" class="photo-modal">
+                <div class="photo-modal-overlay" onclick="ERDashboard.closePhotoModal()"></div>
+                <div class="photo-modal-content">
+                    <button class="photo-modal-close" onclick="ERDashboard.closePhotoModal()">×</button>
+                    <button class="photo-modal-nav photo-nav-prev" onclick="ERDashboard.navigatePhoto(-1)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="photo-modal-image-container">
+                        <img id="photo-modal-img" src="" alt="Patient photo">
+                    </div>
+                    <button class="photo-modal-nav photo-nav-next" onclick="ERDashboard.navigatePhoto(1)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="photo-modal-footer">
+                        <span id="photo-modal-counter">1 of 1</span>
+                        <p id="photo-modal-description"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Demo Controller Bar -->
+    <div id="demo-controller">
+        <div class="controller-content">
+            <button id="info-btn" class="controller-btn info">ℹ️ Info</button>
+            <button id="back-to-demo-picker-btn" class="controller-btn secondary">← Back to Demo Picker</button>
+            <button id="toggle-er-btn" class="controller-btn primary">Toggle ER View</button>
+            <button id="reset-demo-btn" class="controller-btn secondary">Reset Demo</button>
+            <button id="clear-api-key-btn" class="controller-btn secondary">Clear API Key</button>
+            <button id="show-confirm-btn" class="controller-btn secondary">Show Confirmation</button>
+            <!-- Voice Testing -->
+            <button id="test-voice-btn" class="controller-btn secondary">Test Voice</button>
+            <!-- Voice is fixed to Sulafat (Clara's voice) - selector removed -->
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="info-modal">
+        <div class="info-modal-overlay"></div>
+        <div class="info-modal-content">
+            <div class="info-modal-header">
+                <h2>ℹ️ How Clara Works</h2>
+                <button class="info-modal-close" id="info-modal-close">×</button>
+            </div>
+            <div class="info-modal-body">
+                <section class="info-section">
+                    <h3>About Clara</h3>
+                    <p>Clara is an AI-powered Emergency Room pre-arrival triage assistant. It helps patients communicate their symptoms and medical information to the ER <strong>before they arrive</strong>, allowing medical staff to prepare in advance.</p>
+                </section>
+
+                <section class="info-section">
+                    <h3>Available Modes</h3>
+                    <ul class="button-explanations">
+                        <li>
+                            <span class="btn-name">⚡ Try Clara (Limited)</span>
+                            <span class="btn-desc">Full AI experience with real conversations. You get 3 free sessions every 24 hours - no setup required!</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">🎬 Interactive Demo</span>
+                            <span class="btn-desc">A guided walkthrough with scripted responses. Great for seeing how Clara works without using AI.</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">🔑 Unlimited Access</span>
+                            <span class="btn-desc">Use your own Gemini API key for unlimited sessions. Get a free key at aistudio.google.com</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="info-section">
+                    <h3>How to Use</h3>
+                    <ol>
+                        <li><strong>Choose your input method</strong> - Speak or type to Clara</li>
+                        <li><strong>Describe your emergency</strong> - Clara will ask follow-up questions</li>
+                        <li><strong>Review your report</strong> - Check the collected information</li>
+                        <li><strong>Send to ER</strong> - Your report is transmitted to the hospital</li>
+                    </ol>
+                </section>
+
+                <section class="info-section">
+                    <h3>Demo Dashboard Buttons</h3>
+                    <ul class="button-explanations">
+                        <li>
+                            <span class="btn-name">ℹ️ Info</span>
+                            <span class="btn-desc">Shows this help screen</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">← Back to Demo Picker</span>
+                            <span class="btn-desc">Return to the main menu to choose a different mode</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">Toggle ER View</span>
+                            <span class="btn-desc">Show/hide the ER Dashboard that displays incoming patient reports</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">Reset Demo</span>
+                            <span class="btn-desc">Clear all data and start fresh</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">Clear API Key</span>
+                            <span class="btn-desc">Remove your stored Gemini API key</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">Show Confirmation</span>
+                            <span class="btn-desc">Preview the report confirmation screen with sample data</span>
+                        </li>
+                        <li>
+                            <span class="btn-name">Test Voice</span>
+                            <span class="btn-desc">Test Clara's text-to-speech voice output</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="info-section">
+                    <h3>The ER Dashboard</h3>
+                    <p>The ER Dashboard simulates what hospital staff would see. It shows:</p>
+                    <ul>
+                        <li>Incoming patient reports with triage information</li>
+                        <li>Patient ETA and status</li>
+                        <li>Ability to filter and sort patients</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="claraSync.js"></script>
+    <script src="geminiTTS.js"></script>
+    <script src="appMode.js"></script>
+    <script src="demoScenario.js"></script>
+    <script src="clara.js"></script>
+    <script src="voice.js"></script>
+    <script src="photo.js"></script>
+    <script src="erDashboard.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -4796,11 +4796,27 @@ body {
 #mode-selection-screen {
     display: flex;
     flex-direction: column;
-    justify-content: safe center;
+    justify-content: center;
     align-items: center;
-    padding: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
     background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    overflow-y: auto;
+    overflow: hidden;
+}
+
+/* Smaller logo specifically for mode selection screen */
+#mode-selection-screen .clara-logo .logo-icon {
+    width: 100px;
+    height: 100px;
+    margin-top: 0;
+    margin-bottom: var(--space-xs);
+}
+
+#mode-selection-screen .clara-logo {
+    margin-bottom: var(--space-sm);
+}
+
+#mode-selection-screen .clara-logo h1 {
+    font-size: 32px;
 }
 
 .mode-selection-content {
@@ -4846,14 +4862,14 @@ body {
 .mode-selection-subtitle {
     font-size: 15px;
     color: var(--text-secondary);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 
 .mode-options,
 .mode-selection-options {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: 6px;
 }
 
 .mode-option-btn {
@@ -4861,7 +4877,7 @@ body {
     align-items: center;
     gap: var(--space-sm);
     width: 100%;
-    padding: var(--space-sm) var(--space-md);
+    padding: 6px var(--space-md);
     background-color: var(--bg-primary);
     border: 2px solid var(--bg-tertiary);
     border-radius: var(--radius-lg);
@@ -4962,8 +4978,8 @@ body {
 }
 
 .mode-selection-footer {
-    margin-top: var(--space-xl);
-    padding-top: var(--space-lg);
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
 }
 
 .competition-badge {
